@@ -38,6 +38,7 @@ return {
           "lua_ls",
           "pyright",
           "clangd",
+          "hls"
         },
         automatic_installation = true,
       })
