@@ -24,10 +24,30 @@ return {
 
     -- loads vscode style snippets from installed plugins (e.g. friendly-snippets)
     require("luasnip.loaders.from_vscode").lazy_load()
+    require("luasnip.loaders.from_lua").lazy_load({
+         paths = "~/.config/nvim/snippets",
+    })
+
+    vim.keymap.set({ "i", "s" }, "<Tab>", function()
+      if luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+      else
+        return "<Tab>"
+      end
+    end, { expr = true, silent = true })
+
+    vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
+      if luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+      end
+    end, { silent = true })
 
     cmp.setup({
       completion = {
         completeopt = "menu,menuone,preview,noselect",
+      },
+      performance = {
+        max_view_entries = 10,
       },
       snippet = { -- configure how nvim-cmp interacts with snippet engine
         expand = function(args)
@@ -41,8 +61,9 @@ return {
         ["<C-f>"] = cmp.mapping.scroll_docs(4),
         ["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
         ["<C-e>"] = cmp.mapping.abort(), -- close completion window
-        ["<CR>"] = cmp.mapping.confirm({ select = true }),
+        ["<Tab>"] = cmp.mapping.confirm({ select = true }),
       }),
+
       -- sources for autocompletion
       sources = cmp.config.sources({
         { name = "nvim_lsp"},

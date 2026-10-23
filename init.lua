@@ -6,7 +6,7 @@ vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
 vim.opt.relativenumber = true
 vim.opt.number = true
-vim.opt.wrap = false
+vim.opt.wrap = true
 
 vim.api.nvim_create_augroup("RememberFolds", { clear = true })
 vim.api.nvim_create_autocmd("BufWinLeave", {
@@ -22,6 +22,30 @@ vim.api.nvim_create_autocmd("BufWinLeave", {
     end
   end,
 })
+
+vim.api.nvim_create_autocmd("BufUnload", {
+  pattern = "*.tex",
+  callback = function()
+    vim.cmd("VimtexClean")
+  end,
+})
+
+-- Automatically start VimTeX compiler when opening a .tex file
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "tex",
+  callback = function()
+    -- Start compilation only if it's not already running
+    vim.cmd("VimtexCompile")
+  end,
+})
+
+
+vim.filetype.add({
+    extension = {
+        tpp = "cpp",
+    },
+})
+
 
 vim.api.nvim_create_autocmd("BufWinEnter", {
   group = "RememberFolds",
@@ -54,4 +78,9 @@ vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
 
 require("lazy").setup({import="plugins"},{import="plugins.lsp"})
 
-
+vim.cmd([[
+  augroup vimtex_autostop
+    autocmd!
+    autocmd VimLeavePre * VimtexStop
+  augroup END
+]])
