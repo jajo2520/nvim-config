@@ -1,5 +1,6 @@
 return{
     "nvim-treesitter/nvim-treesitter",
+    branch = "master", -- "main" is a rewrite without nvim-treesitter.configs
     build = ":TSUpdate",
     config = function()       
         local config = require("nvim-treesitter.configs")

@@ -52,6 +52,16 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
   pattern = "*",
   command = "silent! loadview",
 })
+-- The LSP plugins need Neovim 0.11+. Stop with a clear message on older
+-- versions (e.g. the system nvim on some lab machines) instead of a stack trace.
+if vim.fn.has("nvim-0.11") == 0 then
+  vim.api.nvim_echo({
+    { "This config needs Neovim 0.11+, but this is " .. tostring(vim.version()) .. ".\n", "ErrorMsg" },
+    { "Install a newer Neovim (see README). Plugins were not loaded.", "WarningMsg" },
+  }, true, {})
+  return
+end
+
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -76,7 +86,10 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
 
-require("lazy").setup({import="plugins"},{import="plugins.lsp"})
+-- Plugins live in lua/plugins/*.lua (lsp.lua included)
+require("lazy").setup({
+  spec = { { import = "plugins" } },
+})
 
 vim.cmd([[
   augroup vimtex_autostop
